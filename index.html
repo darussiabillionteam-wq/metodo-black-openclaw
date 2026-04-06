@@ -178,6 +178,21 @@
       </div>
     </section>
 
+    <section class="section">
+      <div class="wrap">
+        <div class="card">
+          <h2>Antes de comprar: me diga qual é a sua objeção</h2>
+          <p class="lead">Se você entrou na página mas ainda não decidiu, eu uso esse feedback para melhorar a oferta. Clique em uma opção abaixo: eu copio a mensagem pronta e abro o Telegram para você mandar no <strong>@MetodosBlackBR</strong>.</p>
+          <div class="cta-row">
+            <a class="btn btn-secondary js-feedback" data-feedback="Curti a ideia do Método Black, mas ainda não entendi exatamente o que vou conseguir executar com OpenClaw depois da compra." href="https://t.me/MetodosBlackBR" target="_blank" rel="noopener">Não entendi o resultado final</a>
+            <a class="btn btn-secondary js-feedback" data-feedback="Curti a proposta do Método Black, mas ainda estou em dúvida se vale US$ 29 para mim neste momento." href="https://t.me/MetodosBlackBR" target="_blank" rel="noopener">Tenho dúvida sobre o preço</a>
+            <a class="btn btn-secondary js-feedback" data-feedback="Curti a proposta do Método Black, mas queria ver um exemplo mais concreto do que existe dentro do PDF antes de comprar." href="https://t.me/MetodosBlackBR" target="_blank" rel="noopener">Quero prova mais concreta</a>
+          </div>
+          <p style="color:var(--muted);margin-top:12px">Objetivo: capturar objeção real e linguagem real de quem visita a página, em vez de otimizar no escuro.</p>
+        </div>
+      </div>
+    </section>
+
     <section class="section" id="comprar">
       <div class="wrap">
         <div class="card">
@@ -326,6 +341,23 @@
     document.querySelectorAll('.js-track-thanks').forEach((el) => {
       el.href = enrichUrl(new URL(el.getAttribute('href'), siteBaseUrl).toString(), { cta: el.dataset.cta || 'thanks' });
       el.addEventListener('click', () => logEvent('thanks_preview_click', { cta: el.dataset.cta || 'thanks' }));
+    });
+
+    document.querySelectorAll('.js-feedback').forEach((el) => {
+      el.addEventListener('click', async () => {
+        const message = el.dataset.feedback || 'Tenho feedback sobre o Método Black.';
+        try {
+          if (navigator.clipboard && window.isSecureContext) {
+            await navigator.clipboard.writeText(message);
+          }
+        } catch (error) {
+          console.warn('Não foi possível copiar a mensagem de feedback.', error);
+        }
+        logEvent('feedback_click', {
+          cta: (el.textContent || '').trim(),
+          feedback_message: message
+        });
+      });
     });
   </script>
 </body>
