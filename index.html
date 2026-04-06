@@ -82,7 +82,47 @@
       padding: 10px 12px; border: 1px dashed var(--line); border-radius: 12px;
       background: rgba(255,255,255,.02);
     }
+    .survey-box {
+      margin-top: 18px;
+      padding: 18px;
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      background: rgba(255,255,255,.025);
+    }
+    .survey-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+      margin-top: 16px;
+    }
+    .survey-option {
+      width: 100%;
+      text-align: left;
+      cursor: pointer;
+      font: inherit;
+    }
+    .feedback-builder {
+      margin-top: 16px;
+      display: grid;
+      gap: 12px;
+    }
+    .feedback-builder textarea {
+      width: 100%;
+      min-height: 130px;
+      resize: vertical;
+      border-radius: 14px;
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,.04);
+      color: var(--text);
+      padding: 14px;
+      font: inherit;
+      line-height: 1.5;
+    }
+    .micro { font-size: 13px; color: var(--muted); }
     footer { padding: 36px 0 60px; color: var(--muted); }
+    @media (max-width: 720px) {
+      .survey-grid { grid-template-columns: 1fr; }
+    }
     @media (max-width: 900px) {
       .hero-grid, .grid-3 { grid-template-columns: 1fr; }
       .price { font-size: 44px; }
@@ -182,13 +222,31 @@
     <section class="section">
       <div class="wrap">
         <div class="card">
-          <h2>Antes de comprar: me diga qual é a sua objeção</h2>
-          <p class="lead">Se você entrou na página mas ainda não decidiu, eu uso esse feedback para melhorar a oferta. Clique em uma opção abaixo: eu copio a mensagem pronta e abro o Telegram para você mandar no <strong>@MetodosBlackBR</strong>.</p>
-          <div class="cta-row">
-            <a class="btn btn-secondary js-feedback" data-feedback="Curti a ideia do Método Black, mas ainda não entendi exatamente o que vou conseguir executar com OpenClaw depois da compra." href="https://t.me/MetodosBlackBR" target="_blank" rel="noopener">Não entendi o resultado final</a>
-            <a class="btn btn-secondary js-feedback" data-feedback="Curti a proposta do Método Black, mas ainda estou em dúvida se vale US$ 29 para mim neste momento." href="https://t.me/MetodosBlackBR" target="_blank" rel="noopener">Tenho dúvida sobre o preço</a>
-            <a class="btn btn-secondary js-feedback" data-feedback="Curti a proposta do Método Black, mas queria ver um exemplo mais concreto do que existe dentro do PDF antes de comprar." href="https://t.me/MetodosBlackBR" target="_blank" rel="noopener">Quero prova mais concreta</a>
+          <h2>Pesquisa relâmpago: o que está travando sua compra?</h2>
+          <p class="lead">A meta agora é coletar objeção real. Clique no motivo que mais parece com o seu caso, ajuste a mensagem se quiser e depois abra o Telegram para enviar no <strong>@MetodosBlackBR</strong>. Isso reduz atrito e me dá linguagem real para melhorar a página.</p>
+
+          <div class="survey-box">
+            <div class="micro">1 clique para preencher a objeção • 1 clique para copiar • 1 clique para abrir o Telegram</div>
+            <div class="survey-grid">
+              <button class="btn btn-secondary survey-option js-feedback-preset" type="button" data-label="resultado" data-feedback="Entrei na página do Método Black, mas ainda não entendi com clareza qual resultado prático eu vou conseguir executar com OpenClaw depois da compra.">Não entendi o resultado prático</button>
+              <button class="btn btn-secondary survey-option js-feedback-preset" type="button" data-label="preco" data-feedback="Entrei na página do Método Black, gostei da proposta, mas ainda estou em dúvida se US$ 29 faz sentido para mim agora.">Preço ainda me trava</button>
+              <button class="btn btn-secondary survey-option js-feedback-preset" type="button" data-label="prova" data-feedback="Entrei na página do Método Black e queria ver uma prova mais concreta do conteúdo, do passo a passo ou do tipo de automação que vou conseguir montar.">Falta prova concreta</button>
+              <button class="btn btn-secondary survey-option js-feedback-preset" type="button" data-label="timing" data-feedback="Entrei na página do Método Black, mas agora não é o meu timing. Minha principal trava hoje é outra prioridade antes de mexer com OpenClaw.">Agora não é o meu timing</button>
+              <button class="btn btn-secondary survey-option js-feedback-preset" type="button" data-label="confianca" data-feedback="Entrei na página do Método Black, entendi a ideia, mas ainda preciso confiar mais na oferta antes de comprar.">Ainda não confiei o suficiente</button>
+              <button class="btn btn-secondary survey-option js-feedback-preset" type="button" data-label="outro" data-feedback="Entrei na página do Método Black e minha objeção principal é: [escreva aqui em 1 frase].">Tenho outra objeção</button>
+            </div>
+
+            <div class="feedback-builder">
+              <label class="micro" for="feedback-message">Mensagem pronta para enviar</label>
+              <textarea id="feedback-message">Entrei na página do Método Black e minha objeção principal é: [escreva aqui em 1 frase].</textarea>
+              <div class="cta-row">
+                <button class="btn btn-primary" type="button" id="copy-feedback">Copiar mensagem</button>
+                <a class="btn btn-secondary js-feedback-open" id="feedback-telegram-link" href="https://t.me/MetodosBlackBR" target="_blank" rel="noopener">Abrir Telegram</a>
+              </div>
+              <div class="micro">Dica: se quiser, adicione contexto como perfil, urgência e o que faria você comprar hoje.</div>
+            </div>
           </div>
+
           <p style="color:var(--muted);margin-top:12px">Objetivo: capturar objeção real e linguagem real de quem visita a página, em vez de otimizar no escuro.</p>
         </div>
       </div>
@@ -345,9 +403,36 @@
       el.addEventListener('click', () => logEvent('thanks_preview_click', { cta: el.dataset.cta || 'thanks' }));
     });
 
-    document.querySelectorAll('.js-feedback').forEach((el) => {
-      el.addEventListener('click', async () => {
-        const message = el.dataset.feedback || 'Tenho feedback sobre o Método Black.';
+    const feedbackMessageEl = document.getElementById('feedback-message');
+    const feedbackTelegramLinkEl = document.getElementById('feedback-telegram-link');
+    const copyFeedbackEl = document.getElementById('copy-feedback');
+
+    function buildFeedbackMessage(message) {
+      const latest = JSON.parse(localStorage.getItem(trackingKey) || '{}');
+      const source = latest.utm_source || latest.last_utm_source || latest.ref || latest.last_ref || 'direto';
+      const cta = latest.last_checkout_cta || 'nenhum';
+      return `${message}\n\nContexto da visita:\n- source: ${source}\n- session_id: ${latest.session_id || 'n/a'}\n- último CTA de checkout: ${cta}`;
+    }
+
+    function updateFeedbackState(message, label = 'manual') {
+      const finalMessage = buildFeedbackMessage(message);
+      if (feedbackMessageEl) feedbackMessageEl.value = finalMessage;
+      if (feedbackTelegramLinkEl) feedbackTelegramLinkEl.href = 'https://t.me/MetodosBlackBR';
+      logEvent('feedback_preset_selected', {
+        label,
+        feedback_message: finalMessage
+      });
+    }
+
+    document.querySelectorAll('.js-feedback-preset').forEach((el) => {
+      el.addEventListener('click', () => {
+        updateFeedbackState(el.dataset.feedback || 'Tenho feedback sobre o Método Black.', el.dataset.label || 'preset');
+      });
+    });
+
+    if (copyFeedbackEl) {
+      copyFeedbackEl.addEventListener('click', async () => {
+        const message = (feedbackMessageEl && feedbackMessageEl.value.trim()) || 'Tenho feedback sobre o Método Black.';
         try {
           if (navigator.clipboard && window.isSecureContext) {
             await navigator.clipboard.writeText(message);
@@ -355,12 +440,18 @@
         } catch (error) {
           console.warn('Não foi possível copiar a mensagem de feedback.', error);
         }
-        logEvent('feedback_click', {
-          cta: (el.textContent || '').trim(),
-          feedback_message: message
-        });
+        logEvent('feedback_copy_click', { feedback_message: message });
       });
-    });
+    }
+
+    if (feedbackTelegramLinkEl) {
+      feedbackTelegramLinkEl.addEventListener('click', () => {
+        const message = (feedbackMessageEl && feedbackMessageEl.value.trim()) || 'Tenho feedback sobre o Método Black.';
+        logEvent('feedback_open_telegram', { feedback_message: message });
+      });
+    }
+
+    updateFeedbackState('Entrei na página do Método Black e minha objeção principal é: [escreva aqui em 1 frase].', 'default');
   </script>
 </body>
 </html>
