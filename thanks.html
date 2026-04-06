@@ -10,7 +10,9 @@
     .card { background: #12121a; border: 1px solid rgba(255,255,255,.08); border-radius: 22px; padding: 28px; }
     a { color: #c4b5fd; }
     .btn { display: inline-block; margin-top: 18px; padding: 14px 18px; border-radius: 12px; background: #8b5cf6; color: white; text-decoration: none; font-weight: 700; }
-    p { color: #cfcfe0; line-height: 1.65; }
+    p, li { color: #cfcfe0; line-height: 1.65; }
+    .meta { margin-top: 18px; padding: 14px 16px; border-radius: 14px; background: rgba(255,255,255,.03); border: 1px solid rgba(255,255,255,.08); }
+    code { color: #86efac; }
   </style>
 </head>
 <body>
@@ -19,10 +21,65 @@
       <h1>Compra confirmada.</h1>
       <p>Seu acesso ao <strong>Método Black: Automação com OpenClaw</strong> está liberado.</p>
       <p>Baixe o PDF no botão abaixo:</p>
-      <a class="btn" href="assets/Metodo-Black-Automacao-com-OpenClaw.pdf" target="_blank" rel="noopener">Baixar PDF</a>
+      <a class="btn" id="download-pdf" href="assets/Metodo-Black-Automacao-com-OpenClaw.pdf" target="_blank" rel="noopener">Baixar PDF</a>
       <p>Se você voltou aqui sem concluir o pagamento, basta retornar para a página principal e abrir o checkout novamente.</p>
-      <p><a href="index.html">Voltar para a landing page</a></p>
+
+      <div class="meta">
+        <strong>Rastreamento mínimo desta visita</strong>
+        <ul>
+          <li>Origem e UTMs são preservadas na sessão do navegador.</li>
+          <li>Esta página marca uma <code>conversão local</code> para separar clique de checkout vs. visita de entrega.</li>
+          <li>Para auditar rápido no navegador: <code>localStorage.getItem('metodo_black_tracking_v1')</code>.</li>
+        </ul>
+      </div>
+
+      <p><a id="back-home" href="index.html">Voltar para a landing page</a></p>
     </div>
   </div>
+
+  <script>
+    const trackingKey = 'metodo_black_tracking_v1';
+    const eventsKey = 'metodo_black_tracking_events_v1';
+
+    function appendTracking(rawUrl) {
+      const tracking = JSON.parse(localStorage.getItem(trackingKey) || '{}');
+      const url = new URL(rawUrl, window.location.href);
+      const fields = ['utm_source', 'utm_medium', 'utm_campaign', 'utm_content', 'utm_term', 'ref', 'src'];
+      for (const key of fields) {
+        const value = tracking[key] || tracking['last_' + key];
+        if (value) url.searchParams.set(key, value);
+      }
+      if (tracking.session_id) url.searchParams.set('src_session', tracking.session_id);
+      return url.toString();
+    }
+
+    function logEvent(type, extra = {}) {
+      const tracking = JSON.parse(localStorage.getItem(trackingKey) || '{}');
+      const events = JSON.parse(localStorage.getItem(eventsKey) || '[]');
+      events.push({
+        type,
+        at: new Date().toISOString(),
+        path: window.location.pathname,
+        session_id: tracking.session_id || null,
+        ...extra
+      });
+      localStorage.setItem(eventsKey, JSON.stringify(events.slice(-50)));
+    }
+
+    const tracking = JSON.parse(localStorage.getItem(trackingKey) || '{}');
+    tracking.thankyou_visits = (tracking.thankyou_visits || 0) + 1;
+    tracking.conversions = (tracking.conversions || 0) + 1;
+    tracking.last_conversion_at = new Date().toISOString();
+    tracking.last_path = window.location.pathname;
+    localStorage.setItem(trackingKey, JSON.stringify(tracking));
+    logEvent('conversion', { conversions: tracking.conversions, thankyou_visits: tracking.thankyou_visits });
+
+    const downloadBtn = document.getElementById('download-pdf');
+    downloadBtn.href = appendTracking(downloadBtn.getAttribute('href'));
+    downloadBtn.addEventListener('click', () => logEvent('download_pdf'));
+
+    const backHome = document.getElementById('back-home');
+    backHome.href = appendTracking(backHome.getAttribute('href'));
+  </script>
 </body>
 </html>

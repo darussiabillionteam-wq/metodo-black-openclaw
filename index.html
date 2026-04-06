@@ -77,6 +77,11 @@
     .preview h3 { font-size: 30px; line-height: 1.05; margin: 0; }
     .preview p { color: #ddd; }
     .meta { display: flex; gap: 12px; flex-wrap: wrap; color: var(--muted); font-size: 14px; }
+    .tracking-note {
+      margin-top: 16px; font-size: 13px; color: var(--muted);
+      padding: 10px 12px; border: 1px dashed var(--line); border-radius: 12px;
+      background: rgba(255,255,255,.02);
+    }
     footer { padding: 36px 0 60px; color: var(--muted); }
     @media (max-width: 900px) {
       .hero-grid, .grid-3 { grid-template-columns: 1fr; }
@@ -91,9 +96,10 @@
       <h1>Transforme <span style="color:#c4b5fd">OpenClaw</span> em operação real sem cair em formações caras e genéricas.</h1>
       <p class="sub">O <strong>Método Black: Automação com OpenClaw</strong> é um guia direto para quem quer sair da teoria, lançar rápido e usar agentes para gerar execução prática em conteúdo, atendimento e rotina.</p>
       <div class="cta-row">
-        <a class="btn btn-primary" id="buy-top" href="https://buy.stripe.com/4gMcN7apf5Ib306d9mdAk03">Quero liberar o acesso por US$ 29</a>
-        <a class="btn btn-secondary" href="assets/Metodo-Black-Automacao-com-OpenClaw.pdf" target="_blank" rel="noopener">Ver o PDF agora</a>
+        <a class="btn btn-primary js-track-checkout" data-cta="buy-top" id="buy-top" href="https://buy.stripe.com/4gMcN7apf5Ib306d9mdAk03">Quero liberar o acesso por US$ 29</a>
+        <a class="btn btn-secondary js-track-preview" data-cta="preview-top" href="assets/Metodo-Black-Automacao-com-OpenClaw.pdf" target="_blank" rel="noopener">Ver o PDF agora</a>
       </div>
+      <div class="tracking-note">Rastreamento mínimo ativo: sessão, origem, UTM e clique nos CTAs são preservados no navegador para diagnóstico de aquisição/conversão.</div>
 
       <div class="hero-grid">
         <div class="card">
@@ -120,7 +126,7 @@
             <div>
               <div class="price">US$ 29</div>
               <p class="green">Oferta de entrada para agir agora — sem ticket de curso premium.</p>
-              <a class="btn btn-primary" id="buy-side" href="https://buy.stripe.com/4gMcN7apf5Ib306d9mdAk03">Comprar agora</a>
+              <a class="btn btn-primary js-track-checkout" data-cta="buy-side" id="buy-side" href="https://buy.stripe.com/4gMcN7apf5Ib306d9mdAk03">Comprar agora</a>
             </div>
           </div>
         </div>
@@ -154,14 +160,32 @@
       </div>
     </section>
 
+    <section class="section">
+      <div class="wrap">
+        <h2>Prova de conteúdo: o que existe dentro do PDF</h2>
+        <p class="lead">Sem promessa vaga. O material já está pronto e cobre uma sequência prática para sair da curiosidade e montar uma operação enxuta.</p>
+        <div class="bullets">
+          <div class="bullet"><strong>Páginas 1–6:</strong><br>fundamentos para enxergar OpenClaw como operação, não só como chat.</div>
+          <div class="bullet"><strong>Páginas 7–14:</strong><br>dor pagável, validação, preço de entrada e estrutura mínima de uma oferta.</div>
+          <div class="bullet"><strong>Páginas 15–22:</strong><br>copy, bullets, objeções, checkout e distribuição inicial com menos atrito.</div>
+          <div class="bullet"><strong>Páginas 23–30:</strong><br>iterações rápidas, automação de conteúdo, atendimento guiado por contexto e plano de execução em 1 dia.</div>
+        </div>
+        <div class="grid-3" style="margin-top:18px">
+          <div class="bullet"><strong>Entregáveis concretos</strong><br>headline, oferta mínima, página enxuta, checkout e plano de iteração.</div>
+          <div class="bullet"><strong>Prova de processo</strong><br>sem depoimento inventado: a confiança vem da clareza do método e da execução visível.</div>
+          <div class="bullet"><strong>Consumo rápido</strong><br>é para ler hoje e aplicar ainda nesta semana, sem trilha gigante nem enrolação.</div>
+        </div>
+      </div>
+    </section>
+
     <section class="section" id="comprar">
       <div class="wrap">
         <div class="card">
           <h2>Libere o acesso agora</h2>
           <p class="lead">Oferta de lançamento do MVP para validar demanda com compra de baixo atrito. Clique abaixo para abrir o checkout seguro do Stripe.</p>
           <div class="cta-row">
-            <a class="btn btn-primary" id="buy-main" href="https://buy.stripe.com/4gMcN7apf5Ib306d9mdAk03">Abrir checkout</a>
-            <a class="btn btn-secondary" href="thanks.html">Ver página de entrega</a>
+            <a class="btn btn-primary js-track-checkout" data-cta="buy-main" id="buy-main" href="https://buy.stripe.com/4gMcN7apf5Ib306d9mdAk03">Abrir checkout</a>
+            <a class="btn btn-secondary js-track-thanks" data-cta="thanks-preview" href="thanks.html">Ver página de entrega</a>
           </div>
           <p style="color:var(--muted);margin-top:12px">Pagamento único • valor em dólar • acesso imediato ao material • alternativa acessível a cursos de R$ 1.197 a R$ 1.497.</p>
         </div>
@@ -185,11 +209,124 @@
   </footer>
 
   <script>
-    const checkoutUrl = 'https://buy.stripe.com/4gMcN7apf5Ib306d9mdAk03';
+    const checkoutBaseUrl = 'https://buy.stripe.com/4gMcN7apf5Ib306d9mdAk03';
+    const siteBaseUrl = new URL(window.location.href).origin + window.location.pathname.replace(/index\.html$/, '');
+    const trackingKey = 'metodo_black_tracking_v1';
+    const eventsKey = 'metodo_black_tracking_events_v1';
+    const allowedParams = ['utm_source', 'utm_medium', 'utm_campaign', 'utm_content', 'utm_term', 'ref', 'src'];
+
+    function readQueryParams() {
+      const url = new URL(window.location.href);
+      const params = {};
+      for (const key of allowedParams) {
+        const value = url.searchParams.get(key);
+        if (value) params[key] = value;
+      }
+      return params;
+    }
+
+    function getOrCreateTracking() {
+      const now = new Date().toISOString();
+      const query = readQueryParams();
+      const referrer = document.referrer || 'direct';
+      const existing = JSON.parse(localStorage.getItem(trackingKey) || 'null');
+
+      const base = existing || {
+        session_id: 'mb-' + Math.random().toString(36).slice(2, 10),
+        first_seen_at: now,
+        landing_path: window.location.pathname,
+        landing_url: window.location.href,
+        referrer_first: referrer,
+        pageviews: 0,
+        checkout_clicks: 0,
+        preview_clicks: 0,
+        thankyou_visits: 0,
+        conversions: 0
+      };
+
+      base.last_seen_at = now;
+      base.last_path = window.location.pathname;
+      base.last_referrer = referrer;
+      base.pageviews += 1;
+
+      for (const [key, value] of Object.entries(query)) {
+        if (!base[key]) base[key] = value;
+        base['last_' + key] = value;
+      }
+
+      localStorage.setItem(trackingKey, JSON.stringify(base));
+      return base;
+    }
+
+    function logEvent(type, extra = {}) {
+      const tracking = JSON.parse(localStorage.getItem(trackingKey) || '{}');
+      const events = JSON.parse(localStorage.getItem(eventsKey) || '[]');
+      events.push({
+        type,
+        at: new Date().toISOString(),
+        path: window.location.pathname,
+        session_id: tracking.session_id || null,
+        ...extra
+      });
+      localStorage.setItem(eventsKey, JSON.stringify(events.slice(-50)));
+    }
+
+    function enrichUrl(rawUrl, extra = {}) {
+      const tracking = JSON.parse(localStorage.getItem(trackingKey) || '{}');
+      const url = new URL(rawUrl, window.location.href);
+      const merged = {
+        utm_source: tracking.utm_source || tracking.last_utm_source || undefined,
+        utm_medium: tracking.utm_medium || tracking.last_utm_medium || undefined,
+        utm_campaign: tracking.utm_campaign || tracking.last_utm_campaign || undefined,
+        utm_content: tracking.utm_content || tracking.last_utm_content || undefined,
+        utm_term: tracking.utm_term || tracking.last_utm_term || undefined,
+        ref: tracking.ref || tracking.last_ref || undefined,
+        src: tracking.src || tracking.last_src || undefined,
+        src_session: tracking.session_id || undefined,
+        src_landing: tracking.landing_path || undefined,
+        ...extra
+      };
+
+      for (const [key, value] of Object.entries(merged)) {
+        if (value) url.searchParams.set(key, value);
+      }
+
+      return url.toString();
+    }
+
+    const tracking = getOrCreateTracking();
+    logEvent('pageview', { pageviews: tracking.pageviews });
+
     for (const id of ['buy-top', 'buy-side', 'buy-main']) {
       const el = document.getElementById(id);
-      if (el) el.href = checkoutUrl;
+      if (el) {
+        el.href = enrichUrl(checkoutBaseUrl, { cta: el.dataset.cta || id });
+        el.addEventListener('click', () => {
+          const latest = JSON.parse(localStorage.getItem(trackingKey) || '{}');
+          latest.checkout_clicks = (latest.checkout_clicks || 0) + 1;
+          latest.last_checkout_cta = el.dataset.cta || id;
+          latest.last_checkout_click_at = new Date().toISOString();
+          localStorage.setItem(trackingKey, JSON.stringify(latest));
+          logEvent('checkout_click', { cta: el.dataset.cta || id, clicks: latest.checkout_clicks });
+        });
+      }
     }
+
+    document.querySelectorAll('.js-track-preview').forEach((el) => {
+      el.href = enrichUrl(el.getAttribute('href'), { cta: el.dataset.cta || 'preview' });
+      el.addEventListener('click', () => {
+        const latest = JSON.parse(localStorage.getItem(trackingKey) || '{}');
+        latest.preview_clicks = (latest.preview_clicks || 0) + 1;
+        latest.last_preview_click_at = new Date().toISOString();
+        localStorage.setItem(trackingKey, JSON.stringify(latest));
+        logEvent('preview_click', { cta: el.dataset.cta || 'preview', clicks: latest.preview_clicks });
+      });
+    });
+
+    document.querySelectorAll('.js-track-thanks').forEach((el) => {
+      el.href = enrichUrl(new URL(el.getAttribute('href'), siteBaseUrl).toString(), { cta: el.dataset.cta || 'thanks' });
+      el.addEventListener('click', () => logEvent('thanks_preview_click', { cta: el.dataset.cta || 'thanks' }));
+    });
   </script>
 </body>
 </html>
