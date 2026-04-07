@@ -119,7 +119,26 @@
       line-height: 1.5;
     }
     .micro { font-size: 13px; color: var(--muted); }
-    footer { padding: 36px 0 60px; color: var(--muted); }
+    .sticky-cta {
+      position: fixed;
+      left: 16px;
+      right: 16px;
+      bottom: 16px;
+      z-index: 50;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      padding: 14px 16px;
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      background: rgba(11,11,16,.92);
+      backdrop-filter: blur(12px);
+      box-shadow: 0 20px 60px rgba(0,0,0,.35);
+    }
+    .sticky-cta strong { display: block; }
+    .sticky-cta span { color: var(--muted); font-size: 13px; }
+    footer { padding: 36px 0 120px; color: var(--muted); }
     @media (max-width: 720px) {
       .survey-grid { grid-template-columns: 1fr; }
     }
@@ -140,6 +159,11 @@
         <a class="btn btn-secondary js-track-preview" data-cta="preview-top" href="amostra.html" target="_blank" rel="noopener">Ver amostra grátis</a>
       </div>
       <div class="tracking-note">Rastreamento mínimo ativo: sessão, origem, UTM e clique nos CTAs são preservados no navegador para diagnóstico de aquisição/conversão.</div>
+      <div class="meta" style="margin-top:14px">
+        <span>• Você lê hoje</span>
+        <span>• Publica página e checkout mais rápido</span>
+        <span>• Usa a amostra grátis antes de comprar</span>
+      </div>
 
       <div class="hero-grid">
         <div class="card">
@@ -187,6 +211,17 @@
           <div class="bullet">Como pensar em métricas e iteração nas primeiras 24 horas de lançamento.</div>
           <div class="bullet">Como usar automação para conteúdo, atendimento, pesquisa e operação solo.</div>
           <div class="bullet"><strong>O que você consegue sair fazendo:</strong><br>definir a promessa, publicar a página, abrir checkout e ter um plano claro de distribuição inicial.</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="wrap">
+        <h2>O que você consegue fazer nas primeiras 60 minutos</h2>
+        <div class="grid-3">
+          <div class="bullet"><strong>Minuto 1–20</strong><br>Entender a promessa, escolher a dor e cortar a enrolação de estudar ferramenta sem oferta.</div>
+          <div class="bullet"><strong>Minuto 20–40</strong><br>Rascunhar headline, oferta mínima e estrutura da landing com menos fricção.</div>
+          <div class="bullet"><strong>Minuto 40–60</strong><br>Sair com clareza de checkout, CTA e rotina inicial de automação para conteúdo, pesquisa ou atendimento.</div>
         </div>
       </div>
     </section>
@@ -260,7 +295,7 @@
           <p class="lead">Teste de conversão do MVP para quem quer parar de estudar sem executar. Clique abaixo para abrir o checkout seguro do Stripe e acessar um roteiro enxuto para sair com oferta, página e plano de automação no ar.</p>
           <div class="cta-row">
             <a class="btn btn-primary js-track-checkout" data-cta="buy-main" id="buy-main" href="https://buy.stripe.com/cNi3cx54V5IbfMS2uIdAk04">Abrir checkout</a>
-            <a class="btn btn-secondary js-track-thanks" data-cta="thanks-preview" href="thanks.html">Ver página de entrega</a>
+            <a class="btn btn-secondary js-track-preview" data-cta="preview-buy-section" href="amostra.html" target="_blank" rel="noopener">Ver amostra antes de comprar</a>
           </div>
           <div class="grid-3" style="margin-top:18px">
             <div class="bullet"><strong>Pagamento único</strong><br>Sem assinatura escondida. Você paga uma vez e libera o material.</div>
@@ -300,6 +335,14 @@
       </div>
     </section>
   </main>
+
+  <div class="sticky-cta">
+    <div>
+      <strong>Método Black • US$ 19</strong>
+      <span>Leitura rápida + amostra grátis + checkout imediato</span>
+    </div>
+    <a class="btn btn-primary js-track-checkout" data-cta="buy-sticky" id="buy-sticky" href="https://buy.stripe.com/cNi3cx54V5IbfMS2uIdAk04">Comprar</a>
+  </div>
 
   <footer>
     <div class="wrap">Método Black • MVP publicado para validação rápida de demanda.</div>
@@ -394,7 +437,7 @@
     const tracking = getOrCreateTracking();
     logEvent('pageview', { pageviews: tracking.pageviews });
 
-    for (const id of ['buy-top', 'buy-side', 'buy-main']) {
+    for (const id of ['buy-top', 'buy-side', 'buy-main', 'buy-sticky']) {
       const el = document.getElementById(id);
       if (el) {
         el.href = enrichUrl(checkoutBaseUrl, { cta: el.dataset.cta || id });
